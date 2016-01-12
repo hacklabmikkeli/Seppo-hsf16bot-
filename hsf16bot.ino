@@ -11,11 +11,11 @@
 #define rightDirectionPin1 12
 #define rightDirectionPin2 13
 
-#define turnSpeed 150 //speed of motors while turning, from 0 - 255, tho has to be atleast 70 in order for motors to move
-#define driveSpeed 100 //speed of motors while driving forward 0 - 255, tho has to be atleast 70 in order for robot to move
-#define sideWallDistance 5 //if distance to sidewall is lower than this, robot will try to fix the situation
+#define turnSpeed 70
+#define driveSpeed 80
+#define sideWallDistance 4
 
-long getDistance(int echo, int trig) { //returns the distance from sensor as centimeters
+long getDistance(int echo, int trig) {
   long duration, distance;
   digitalWrite(trig, LOW);
   delayMicroseconds(2);
@@ -27,7 +27,7 @@ long getDistance(int echo, int trig) { //returns the distance from sensor as cen
   return distance;
 }
 
-void turnRight(){ // Turn right without moving forward
+void turnRight(){
 
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
@@ -42,8 +42,7 @@ void turnRight(){ // Turn right without moving forward
  
 }
 
-void turnLeft(){ //Turn left without moving forward
-  
+void turnLeft(){
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
  
@@ -57,31 +56,7 @@ void turnLeft(){ //Turn left without moving forward
 
 }
 
-void turnRightSlow(){ //Turn right while moving forward
- 
-  digitalWrite(leftDirectionPin1, HIGH);
-  digitalWrite(leftDirectionPin2, LOW);
-  digitalWrite(rightDirectionPin1, LOW);
-  digitalWrite(rightDirectionPin2, HIGH);
-
-  analogWrite(leftSpeedPin, 120);
-  delay(20);
- 
-}
-
-void turnLeftSlow(){ //Turn left while moving forward
- 
-  digitalWrite(leftDirectionPin1, LOW);
-  digitalWrite(leftDirectionPin2, HIGH);
-  digitalWrite(rightDirectionPin1, HIGH);
-  digitalWrite(rightDirectionPin2, LOW);
-
-  analogWrite(rightSpeedPin, 120);
-  delay(20);
-
-}
-
-void drive(){ //Drive forward
+void drive(){
  
   digitalWrite(leftDirectionPin1, HIGH);
   digitalWrite(leftDirectionPin2, LOW);
@@ -92,7 +67,7 @@ void drive(){ //Drive forward
   analogWrite(rightSpeedPin, driveSpeed);
 }
 
-void reverse(){ //Drive backwards
+void reverse(){
 
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
@@ -128,30 +103,30 @@ void setup() {
 
 void loop() {
   long leftDistance = getDistance(leftEchoPin, leftTrigPin);
+  delay(2);
   long middleDistance = getDistance(middleEchoPin, middleTrigPin);
+  delay(2);
   long rightDistance = getDistance(rightEchoPin, rightTrigPin);
+  delay(2);
 
-  if(middleDistance < 4){ // If distance in front of a robot is less than 4cm, reverse
+  if(middleDistance < 4){
     reverse();
-  }else if(middleDistance < 10){       // If distance in front of a robot is more than 4cm
-    if(leftDistance < rightDistance){  // but less than 10cm, measure distance on both sides 
-      turnRight();                     // and turn to side which has more space
+  }else if(middleDistance < 10){
+    if(leftDistance < rightDistance){
+      turnRight();
     }else{
       turnLeft();
     }
   } else {
-    drive();                                          // If distance in front of a robot is more than 10cm, drive forward
-    if(middleDistance < 15){                          // If distance in front of a robot is less than 15cm, check if we are too close the wall
-      if(leftDistance < sideWallDistance){
-        turnRightSlow();
-      } else if(rightDistance < sideWallDistance){
-        turnLeftSlow();
-      }
+    if(leftDistance < sideWallDistance){
+      turnRight();
+    } else if(rightDistance < sideWallDistance){
+      turnLeft();
+    }else{
+      drive();
     }
   }
   /*
-  // For debugging purposes
-  
   Serial.print("Left: ");
   Serial.println(leftDistance);
 
