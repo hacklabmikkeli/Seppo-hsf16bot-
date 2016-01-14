@@ -11,9 +11,9 @@
 #define rightDirectionPin1 12
 #define rightDirectionPin2 13
 
-#define turnSpeed 70
-#define driveSpeed 80
-#define sideWallDistance 4
+#define turnSpeed 80
+#define driveSpeed 65
+#define sideWallDistance 5
 
 long getDistance(int echo, int trig) {
   long duration, distance;
@@ -27,11 +27,11 @@ long getDistance(int echo, int trig) {
   return distance;
 }
 
-void turnRight(){
+void turnRight(int turnDelay){
 
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
- 
+  
   digitalWrite(leftDirectionPin1, HIGH);
   digitalWrite(leftDirectionPin2, LOW);
   digitalWrite(rightDirectionPin1, LOW);
@@ -39,13 +39,15 @@ void turnRight(){
 
   analogWrite(leftSpeedPin, turnSpeed);
   analogWrite(rightSpeedPin, turnSpeed);
- 
+
+  delay(turnDelay);
+  
 }
 
-void turnLeft(){
+void turnLeft(int turnDelay){
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
- 
+  
   digitalWrite(leftDirectionPin1, LOW);
   digitalWrite(leftDirectionPin2, HIGH);
   digitalWrite(rightDirectionPin1, HIGH);
@@ -54,24 +56,41 @@ void turnLeft(){
   analogWrite(leftSpeedPin, turnSpeed);
   analogWrite(rightSpeedPin, turnSpeed);
 
+  delay(turnDelay);
+
 }
 
-void drive(){
- 
+void drive(long frontDistance){
+  
   digitalWrite(leftDirectionPin1, HIGH);
   digitalWrite(leftDirectionPin2, LOW);
   digitalWrite(rightDirectionPin1, HIGH);
   digitalWrite(rightDirectionPin2, LOW);
 
-  analogWrite(leftSpeedPin, driveSpeed);
-  analogWrite(rightSpeedPin, driveSpeed);
+  if(frontDistance < 25){
+    analogWrite(leftSpeedPin, 70);
+    analogWrite(rightSpeedPin, 70);
+  }else if(frontDistance < 35){
+    analogWrite(leftSpeedPin, 80);
+    analogWrite(rightSpeedPin, 80);
+  }else if(frontDistance < 45){
+    analogWrite(leftSpeedPin, 90);
+    analogWrite(rightSpeedPin, 90);
+  }else if(frontDistance < 60){
+    analogWrite(leftSpeedPin, 100);
+    analogWrite(rightSpeedPin, 100);
+  }else{
+    analogWrite(leftSpeedPin, 110);
+    analogWrite(rightSpeedPin, 110);
+  }
+
 }
 
 void reverse(){
 
   analogWrite(leftSpeedPin, 0);
   analogWrite(rightSpeedPin, 0);
- 
+  
   digitalWrite(leftDirectionPin1, LOW);
   digitalWrite(leftDirectionPin2, HIGH);
   digitalWrite(rightDirectionPin1, LOW);
@@ -92,7 +111,7 @@ void setup() {
   pinMode(leftEchoPin, INPUT);
   pinMode(middleEchoPin, INPUT);
   pinMode(rightEchoPin, INPUT);
- 
+  
   pinMode(leftSpeedPin, OUTPUT);
   pinMode(rightSpeedPin, OUTPUT);
   pinMode(leftDirectionPin1, OUTPUT);
@@ -111,19 +130,25 @@ void loop() {
 
   if(middleDistance < 4){
     reverse();
-  }else if(middleDistance < 10){
-    if(leftDistance < rightDistance){
-      turnRight();
+  }else if(middleDistance < 20){
+    if(leftDistance > 18){
+      turnLeft(70);
+    }else if(rightDistance > 10){
+      turnRight(70);
     }else{
-      turnLeft();
+      if(leftDistance > 10){
+        turnLeft(70);
+      }else{
+        reverse();
+      }
     }
   } else {
     if(leftDistance < sideWallDistance){
-      turnRight();
+      turnRight(10);
     } else if(rightDistance < sideWallDistance){
-      turnLeft();
+      turnLeft(10);
     }else{
-      drive();
+      drive(middleDistance);
     }
   }
   /*
@@ -136,5 +161,5 @@ void loop() {
   Serial.print("Right: ");
   Serial.println(rightDistance);
 */
- 
+  
 }
