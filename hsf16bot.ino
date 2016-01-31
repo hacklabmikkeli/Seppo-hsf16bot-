@@ -131,35 +131,24 @@ void loop() {
   if(middleDistance < 4){
     reverse();
   }else if(middleDistance < 20){
-    if(leftDistance > 18){
-      turnLeft(70);
+    if(leftDistance > 21){
+      turnLeft(50);
     }else if(rightDistance > 10){
-      turnRight(70);
+      turnRight(50);
     }else{
       if(leftDistance > 10){
-        turnLeft(70);
+        turnLeft(50);
       }else{
         reverse();
       }
     }
   } else {
     if(leftDistance < sideWallDistance){
-      turnRight(10);
+      turnRight(3);
     } else if(rightDistance < sideWallDistance){
-      turnLeft(10);
+      turnLeft(3);
     }else{
       drive(middleDistance);
     }
-  }
-  /*
-  Serial.print("Left: ");
-  Serial.println(leftDistance);
-
-  Serial.print("Middle: ");
-  Serial.println(middleDistance);
-
-  Serial.print("Right: ");
-  Serial.println(rightDistance);
-*/
-  
+  } 
 }
